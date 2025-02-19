@@ -98,90 +98,73 @@ class PasswordChecker
 }
 
 Task 2:
-
 using System;
-using System.Text;
 using System.Linq;
+using System.Text;
 
-class PasswordGenerator
+class RandomPasswordGenerator
 {
     static void Main()
     {
-        // Collecting inputs from the user
-        Console.Write("Enter your first name: ");
+        // Collecting user input for password generation
+        Console.Write("Enter your First Name: ");
         string firstName = Console.ReadLine();
 
-        Console.Write("Enter your last name: ");
+        Console.Write("Enter your Last Name: ");
         string lastName = Console.ReadLine();
 
-        Console.Write("Enter your registration number (3 digits): ");
-        string regNumber = Console.ReadLine();
+        Console.Write("Enter your Registration Number: ");
+        string registrationNumber = Console.ReadLine();
 
-        Console.Write("Enter your favorite movie: ");
-        string favMovie = Console.ReadLine();
+        Console.Write("Enter your Favorite Movie: ");
+        string favoriteMovie = Console.ReadLine();
 
-        Console.Write("Enter your favorite food: ");
-        string favFood = Console.ReadLine();
+        Console.Write("Enter your Favorite Food: ");
+        string favoriteFood = Console.ReadLine();
 
-        // Generate a random password based on the inputs
-        string password = GenerateRandomPassword(firstName, lastName, regNumber, favMovie, favFood);
-
-        Console.WriteLine($"Generated Password: {password}");
+        // Generate and display the random password
+        string password = GenerateRandomPassword(firstName, lastName, registrationNumber, favoriteMovie, favoriteFood);
+        Console.WriteLine("\nGenerated Password: " + password);
+        Console.ReadKey();
     }
 
-    static string GenerateRandomPassword(string firstName, string lastName, string regNumber, string favMovie, string favFood)
+    static string GenerateRandomPassword(string firstName, string lastName, string registrationNumber, string favoriteMovie, string favoriteFood)
     {
-        // Start constructing the password
-        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+        StringBuilder passwordBuilder = new StringBuilder();
 
-        // Add first 2 characters from first name (if available)
-        if (firstName.Length >= 2)
+        // Add parts of user input for personalization
+        passwordBuilder.Append(firstName.Substring(0, Math.Min(3, firstName.Length))); // First 3 characters of First Name
+        passwordBuilder.Append(lastName.Substring(0, Math.Min(3, lastName.Length))); // First 3 characters of Last Name
+        passwordBuilder.Append(registrationNumber.Substring(0, Math.Min(4, registrationNumber.Length))); // First 4 characters of Registration Number
+        passwordBuilder.Append(favoriteMovie.Substring(0, Math.Min(3, favoriteMovie.Length))); // First 3 characters of Favorite Movie
+        passwordBuilder.Append(favoriteFood.Substring(0, Math.Min(3, favoriteFood.Length))); // First 3 characters of Favorite Food
+
+        // Add random digits
+        for (int i = 0; i < 2; i++)
         {
-            password.Append(firstName.Substring(0, 2));
+            passwordBuilder.Append(random.Next(0, 10)); // Append a random digit
         }
 
-        // Add first 2 characters from last name (if available)
-        if (lastName.Length >= 2)
+        // Add random special characters
+        char[] specialCharacters = { '!', '@', '#', '$', '%', '^', '&', '*' };
+        passwordBuilder.Append(specialCharacters[random.Next(specialCharacters.Length)]); // Add a random special character
+
+        // Add a random uppercase letter
+        passwordBuilder.Append((char)random.Next('A', 'Z' + 1)); // Add a random uppercase letter
+
+        // Add random lowercase letter
+        passwordBuilder.Append((char)random.Next('a', 'z' + 1)); // Add a random lowercase letter
+
+        // Shuffle the characters to ensure randomness
+        string password = new string(passwordBuilder.ToString().OrderBy(c => random.Next()).ToArray());
+
+        // Ensure the password has a minimum length of 12 characters
+        while (password.Length < 12)
         {
-            password.Append(lastName.Substring(0, 2));
+            password += (char)random.Next('a', 'z' + 1); // Add random lowercase letter if password is too short
         }
 
-        // Add 3 digits from registration number (ensuring it's numeric and 3 digits)
-        if (regNumber.Length == 3 && regNumber.All(char.IsDigit))
-        {
-            password.Append(regNumber);
-        }
-
-        // Add last 2 characters from favorite movie (if available)
-        if (favMovie.Length >= 2)
-        {
-            password.Append(favMovie.Substring(favMovie.Length - 2));
-        }
-
-        // Add last 2 characters from favorite food (if available)
-        if (favFood.Length >= 2)
-        {
-            password.Append(favFood.Substring(favFood.Length - 2));
-        }
-
-        // Add a random special character
-        string specialChars = "@#$%^&*!&()_+=-";
-        Random rand = new Random();
-        password.Append(specialChars[rand.Next(specialChars.Length)]);
-
-        // Add a random number
-        password.Append(rand.Next(0, 10));
-
-        // Add an uppercase letter
-        string upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        password.Append(upperCaseChars[rand.Next(upperCaseChars.Length)]);
-
-        // Add a random length from 8 to 12
-        while (password.Length < rand.Next(8, 13))
-        {
-            password.Append(specialChars[rand.Next(specialChars.Length)]);
-        }
-
-        return password.ToString();
+        return password;
     }
 }
